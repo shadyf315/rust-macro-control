@@ -8,12 +8,31 @@ exit /b
 :PSCODE
 $ErrorActionPreference = 'Stop'
 
+$script:Lang = $null
+do {
+    Clear-Host
+    Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
+    Write-Host '  ║            LANGUAGE / ВЫБОР ЯЗЫКА            ║' -ForegroundColor Cyan
+    Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
+    Write-Host '  ║   1   Русский                                ║' -ForegroundColor White
+    Write-Host '  ║   2   English                                ║' -ForegroundColor White
+    Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
+    $languageChoice = Read-Host 'Select / Выберите язык (1-2)'
+    if ($languageChoice -eq '1') { $script:Lang = 'ru' }
+    elseif ($languageChoice -eq '2') { $script:Lang = 'en' }
+} while (-not $script:Lang)
+function L {
+    param([string]$Russian, [string]$English)
+    if ($script:Lang -eq 'en') { return $English }
+    return $Russian
+}
+
 # Keep one controller process so two copies cannot send input at the same time.
 $singleMutex = [System.Threading.Mutex]::new($false, 'Local\RustMacroController')
 $mutexOwned = $false
 try { $mutexOwned = $singleMutex.WaitOne(0) }
 catch [System.Threading.AbandonedMutexException] { $mutexOwned = $true }
-if (-not $mutexOwned) { throw 'Контроллер уже запущен: используйте его окно, не запускайте второй экземпляр.' }
+if (-not $mutexOwned) { throw (L 'Контроллер уже запущен: используйте его окно, не запускайте второй экземпляр.' 'The controller is already running. Use its existing window instead of starting another copy.') }
 
 # Last working timing values, kept for rollback:
 # hot wait 1000ms; E hold ~1500ms; pre-E 100ms; post-E 50ms;
@@ -109,7 +128,7 @@ $root = Split-Path -Parent $p
 $state = Join-Path $root '.digits-index'
 $listPath = Join-Path $root 'digits.txt'
 $items = @(Get-Content -LiteralPath $listPath | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^\d{4}$' })
-if (!$items.Count) { throw 'В digits.txt нет строк ровно из четырёх цифр.' }
+if (!$items.Count) { throw (L 'В digits.txt нет строк ровно из четырёх цифр.' 'digits.txt has no lines containing exactly four digits.') }
 function Reset-ListPointer {
     Set-Content -LiteralPath $state -Value '0' -NoNewline
 }
@@ -120,7 +139,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host '  Version v1.1.0 | GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+    Write-Host (L '  Версия v2.0.0 | GitHub: https://github.com/shadyf315/rust-macro-control' '  Version v2.0.0 | GitHub: https://github.com/shadyf315/rust-macro-control') -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -129,7 +148,7 @@ function Show-NumberedList {
     do {
         Clear-Host
         Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
-        Write-Host '  ║              СПИСОК ВАРИАЦИЙ                 ║' -ForegroundColor Cyan
+        Write-Host ('  ║              {0,-30}║' -f (L 'СПИСОК ВАРИАЦИЙ' 'NUMBERED LIST')) -ForegroundColor Cyan
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
         $first = $page * $pageSize
         $last = [Math]::Min($first + $pageSize - 1, $items.Count - 1)
@@ -137,9 +156,9 @@ function Show-NumberedList {
             Write-Host ('  {0,5}.  {1}' -f ($n + 1), $items[$n]) -ForegroundColor White
         }
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
-        Write-Host ('  Страница {0}/{1}  |  1 — далее  2 — назад  0 — выход' -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
+        Write-Host ((L '  Страница {0}/{1}  |  1 — далее  2 — назад  0 — выход' '  Page {0}/{1}  |  1 — next  2 — previous  0 — exit') -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
         Show-RepositoryLink
-        $pageChoice = Read-Host 'Введите цифру (0-2)'
+        $pageChoice = Read-Host (L 'Введите цифру (0-2)' 'Enter a number (0-2)')
         if ($pageChoice -eq '1' -and $page -lt $lastPage) { $page++ }
         elseif ($pageChoice -eq '2' -and $page -gt 0) { $page-- }
     } while ($pageChoice -ne '0')
@@ -147,66 +166,100 @@ function Show-NumberedList {
 function Show-ControlPanel {
     Clear-Host
     Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
-    Write-Host '  ║              R U S T   C O N T R O L         ║' -ForegroundColor Cyan
+    Write-Host ('  ║              {0,-30}║' -f (L 'ПАНЕЛЬ УПРАВЛЕНИЯ' 'CONTROL PANEL')) -ForegroundColor Cyan
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
-    Write-Host '  ║   1   Запустить / продолжить скрипт          ║' -ForegroundColor White
-    Write-Host '  ║   2   Сбросить список цифр                   ║' -ForegroundColor White
-    Write-Host '  ║   3   Пропустить следующую запись            ║' -ForegroundColor White
-    Write-Host '  ║   4   Просмотреть нумерованный список         ║' -ForegroundColor White
-    Write-Host '  ║   0   Выход                                  ║' -ForegroundColor White
+    Write-Host ('  ║   1   {0,-40}║' -f (L 'Запустить / продолжить скрипт' 'Start / resume macro')) -ForegroundColor White
+    Write-Host ('  ║   2   {0,-40}║' -f (L 'Сбросить список цифр' 'Reset digit list')) -ForegroundColor White
+    Write-Host ('  ║   3   {0,-40}║' -f (L 'Пропустить следующую запись' 'Skip next entry')) -ForegroundColor White
+    Write-Host ('  ║   4   {0,-40}║' -f (L 'Просмотреть нумерованный список' 'View numbered list')) -ForegroundColor White
+    Write-Host ('  ║   0   {0,-40}║' -f (L 'Выход' 'Exit')) -ForegroundColor White
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
-    Write-Host '  ║   Right Shift   Пауза / продолжить           ║' -ForegroundColor Yellow
+    Write-Host ('  ║   Right Shift   {0,-31}║' -f (L 'Пауза / продолжить' 'Pause / resume')) -ForegroundColor Yellow
     Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
     Show-RepositoryLink
-    Write-Host '  Выберите пункт (0-4): ' -NoNewline -ForegroundColor Cyan
+    Write-Host (L '  Выберите пункт (0-4): ' '  Choose an option (0-4): ') -NoNewline -ForegroundColor Cyan
 }
-
 function Show-Menu {
     Clear-Host
-    Show-RepositoryLink
     Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
     Write-Host '  ║              R U S T   C O N T R O L         ║' -ForegroundColor Cyan
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
     Write-Host '  ║                                              ║' -ForegroundColor DarkCyan
-    Write-Host '  ║   1   Открыть управление скриптом            ║' -ForegroundColor White
-    Write-Host '  ║   2   Сбросить список цифр                   ║' -ForegroundColor White
-    Write-Host '  ║   3   Пропустить следующую запись            ║' -ForegroundColor White
-    Write-Host '  ║   4   Просмотреть нумерованный список         ║' -ForegroundColor White
-    Write-Host '  ║   0   Выход                                  ║' -ForegroundColor White
+    Write-Host ('  ║   1   {0,-40}║' -f (L 'Открыть управление скриптом' 'Open macro control')) -ForegroundColor White
+    Write-Host ('  ║   2   {0,-40}║' -f (L 'Сбросить список цифр' 'Reset digit list')) -ForegroundColor White
+    Write-Host ('  ║   3   {0,-40}║' -f (L 'Пропустить следующую запись' 'Skip next entry')) -ForegroundColor White
+    Write-Host ('  ║   4   {0,-40}║' -f (L 'Просмотреть нумерованный список' 'View numbered list')) -ForegroundColor White
+    Write-Host ('  ║   0   {0,-40}║' -f (L 'Выход' 'Exit')) -ForegroundColor White
     Write-Host '  ║                                              ║' -ForegroundColor DarkCyan
     Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
-    Write-Host '       Во время работы: Right Shift — пауза' -ForegroundColor DarkGray
+    Write-Host (L '       Во время работы: Right Shift — пауза' '       While running: Right Shift pauses/resumes') -ForegroundColor DarkGray
     Show-RepositoryLink
 }
+function Show-RequiredInstructions {
+    while ($true) {
+        Clear-Host
+        Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
+        Write-Host ('  ║              {0,-30}║' -f (L 'ИНСТРУКЦИЯ ПЕРЕД ЗАПУСКОМ' 'BEFORE YOU START')) -ForegroundColor Cyan
+        Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
+        Write-Host (L 'ПОДГОТОВКА' 'SETUP') -ForegroundColor Yellow
+        Write-Host (L '  1. Распакуй ZIP. Не отделяй BAT от digits.txt.' '  1. Extract the ZIP. Keep the BAT and digits.txt together.') -ForegroundColor White
+        Write-Host (L '  2. Выбери язык: 1 — русский, 2 — английский.' '  2. Choose a language: 1 — Russian, 2 — English.') -ForegroundColor White
+        Write-Host (L 'ГЛАВНОЕ МЕНЮ' 'MAIN MENU') -ForegroundColor Yellow
+        Write-Host (L '  3. Нажми 1, чтобы открыть управление. Макрос пока не запущен.' '  3. Press 1 to open control. The macro does not start yet.') -ForegroundColor White
+        Write-Host (L '  4. Прочитай эту инструкцию и введи 1 для подтверждения.' '  4. Read this guide and enter 1 to confirm you read it.') -ForegroundColor White
+        Write-Host (L '     Введи 0, чтобы закрыть программу.' '     Enter 0 to exit the program.') -ForegroundColor White
+        Write-Host (L 'ЗАПУСК И ВОЗРОЖДЕНИЕ' 'START AND RESPAWN') -ForegroundColor Yellow
+        Write-Host (L '  5. Переключись в Rust и нажми Right Shift — цикл начнётся.' '  5. Switch to Rust and press Right Shift to start the cycle.') -ForegroundColor White
+        Write-Host (L '     Right Shift ставит на паузу и продолжает с того же шага.' '     Right Shift pauses and resumes from the same step.') -ForegroundColor White
+        Write-Host (L '  6. После 5 завершённых циклов будет пауза.' '  6. The macro pauses after every 5 completed cycles.') -ForegroundColor White
+        Write-Host (L '     Возродись у первого отмеченного спальника, вернись в Rust' '     Respawn at the first marked sleeping bag, return to Rust,') -ForegroundColor White
+        Write-Host (L '     и нажми Right Shift. Макрос продолжит со следующей записью.' '     and press Right Shift. The macro continues with the next entry.') -ForegroundColor White
+        Write-Host (L 'УПРАВЛЕНИЕ И СПИСОК' 'CONTROLS AND LIST') -ForegroundColor Yellow
+        Write-Host (L '  7. Цифровые команды работают, когда активно окно BAT:' '  7. Number commands work while the BAT window is focused:') -ForegroundColor White
+        Write-Host (L '     1 запуск, 2 сброс, 3 пропуск, 4 список, 0 выход.' '     1 start, 2 reset, 3 skip, 4 list, 0 exit.') -ForegroundColor White
+        Write-Host (L '  8. В просмотре списка: 1 следующая, 2 предыдущая, 0 назад.' '  8. In list view: 1 next page, 2 previous page, 0 return.') -ForegroundColor White
+        Write-Host (L '  9. Позиция сохраняется в .digits-index после полного цикла.' '  9. Position is saved in .digits-index after a full cycle.') -ForegroundColor White
+        Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
+        Show-RepositoryLink
+        $ack = Read-Host (L 'Введи 1 — прочитал; 0 — выйти' 'Enter 1 — read; 0 — exit')
+        if ($ack -eq '1') { return $true }
+        if ($ack -eq '0') { return $false }
+        Write-Host (L 'Введи 1 после прочтения инструкции или 0 для выхода.' 'After reading, enter 1 to continue or 0 to exit.') -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+}
+
+
 do {
     Show-Menu
-    $choice = Read-Host 'Выберите пункт (0-4)'
+    $choice = Read-Host (L 'Выберите пункт (0-4)' 'Choose an option (0-4)')
     if ($choice -eq '2') {
         Reset-ListPointer
-        Write-Host 'Позиция списка сброшена.' -ForegroundColor Green
+        Write-Host (L 'Позиция списка сброшена.' 'List position reset to the first entry.') -ForegroundColor Green
         Start-Sleep -Seconds 1
     } elseif ($choice -eq '3') {
         Skip-ListPointer
-        Write-Host 'Следующая запись пропущена.' -ForegroundColor Yellow
+        Write-Host (L 'Следующая запись пропущена.' 'Skipped the next entry.') -ForegroundColor Yellow
         Start-Sleep -Seconds 1
     } elseif ($choice -eq '4') {
         Show-NumberedList
     }
-} while ($choice -in @('2','3','4','g','G'))
+} while ($choice -in @('2','3','4'))
 if ($choice -ne '1') { exit }
+if (-not (Show-RequiredInstructions)) { exit }
 
 [RightShiftHotkey]::Start()
 for ($q = 0; $q -lt 40 -and [RightShiftHotkey]::Ready -eq 0; $q++) { Start-Sleep -Milliseconds 50 }
 if ([RightShiftHotkey]::Ready -ne 1) {
-    throw "Не удалось зарегистрировать правый Shift. Код ошибки: $([RightShiftHotkey]::ErrorCode)"
+    throw ((L 'Не удалось зарегистрировать правый Shift. Код ошибки: {0}' 'Could not register Right Shift. Error code: {0}') -f [RightShiftHotkey]::ErrorCode)
 }
 
 Show-ControlPanel
 $toggleMacro = {
     if ([RightShiftHotkey]::ConsumeToggle() -eq 1) {
         $newState = [RightShiftHotkey]::ToggleRunning()
-        if ($newState -ne 0) { Write-Host '  ● СКРИПТ РАБОТАЕТ' -ForegroundColor Green }
-        else { Write-Host '  ◼ ПАУЗА — нажмите Right Shift для продолжения' -ForegroundColor Yellow }
+        if ($newState -ne 0) { Write-Host (L '  ● СКРИПТ РАБОТАЕТ' '  ● MACRO RUNNING') -ForegroundColor Green }
+        else { Write-Host (L '  ◼ ПАУЗА — нажмите Right Shift для продолжения' '  ◼ PAUSED — press Right Shift to resume') -ForegroundColor Yellow }
     }
 }
 $pauseSecond = {
@@ -241,10 +294,10 @@ try {
         if ([Console]::KeyAvailable) {
             $consoleKey = [Console]::ReadKey($true).KeyChar
             if ($consoleKey -eq '0') { break }
-            if ($consoleKey -eq '2') { Reset-ListPointer; Write-Host '  ✓ Список сброшен.' -ForegroundColor Cyan }
-            if ($consoleKey -eq '3') { Skip-ListPointer; Write-Host '  → Следующая запись пропущена.' -ForegroundColor Yellow }
+            if ($consoleKey -eq '2') { Reset-ListPointer; Write-Host (L '  ✓ Список сброшен.' '  ✓ List reset.') -ForegroundColor Cyan }
+            if ($consoleKey -eq '3') { Skip-ListPointer; Write-Host (L '  → Следующая запись пропущена.' '  → Skipped the next entry.') -ForegroundColor Yellow }
             if ($consoleKey -eq '4') { Show-NumberedList; Show-ControlPanel }
-            if ($consoleKey -eq '1') { [RightShiftHotkey]::Running = 1; Write-Host '  ● Скрипт запущен.' -ForegroundColor Green }
+            if ($consoleKey -eq '1') { [RightShiftHotkey]::Running = 1; Write-Host (L '  ● Скрипт запущен.' '  ● Macro started.') -ForegroundColor Green }
         }
         if ([RightShiftHotkey]::IsRunning() -eq 0) { Start-Sleep -Milliseconds 10; continue }
 
@@ -284,7 +337,7 @@ try {
                 $attemptsSinceRespawn = 0
                 [RightShiftHotkey]::Running = 0
                 [void][RightShiftHotkey]::ConsumeToggle()
-                Write-Host '5 попыток завершено. Возродитесь вручную у первого отмеченного спальника, затем нажмите Right Shift для продолжения.' -ForegroundColor Yellow
+                Write-Host (L '5 попыток завершено. Возродись вручную у первого отмеченного спальника и нажми Right Shift для продолжения.' '5 attempts completed. Respawn manually at the first marked sleeping bag, then press Right Shift to continue.') -ForegroundColor Yellow
             }
         } finally {
             [MacroInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
