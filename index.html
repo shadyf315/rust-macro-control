@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101310">
+  <meta name="description" content="Локальный макрос управления для Rust с настраиваемым списком четырёхзначных записей.">
+  <title>Rust Macro Control</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101310;--panel:#171c18;--line:#303a31;--ink:#f1f3ee;--muted:#a8b2a6;--lime:#c3f36b;--orange:#fa8754;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;--sans:Inter,"Segoe UI",Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 78% 4%,#293525 0,transparent 36%),var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}
+    a{color:inherit}.wrap{width:min(1120px,calc(100% - 40px));margin:auto}.top{padding:24px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff18}.brand{font:700 13px var(--mono);letter-spacing:.11em}.brand i{color:var(--lime);font-style:normal}.pill{color:var(--muted);font:12px var(--mono);border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+    .hero{padding:90px 0 76px;display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}.eyebrow{color:var(--lime);font:12px var(--mono);letter-spacing:.15em;text-transform:uppercase}.hero h1{font-size:clamp(44px,7vw,82px);line-height:.98;letter-spacing:-.065em;margin:18px 0 24px;max-width:700px}.hero h1 span{color:var(--lime)}.lead{font-size:18px;color:var(--muted);max-width:600px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:32px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;padding:13px 18px;border-radius:9px;font-weight:700}.primary{background:var(--lime);color:#17200d}.secondary{border:1px solid var(--line);background:#ffffff08}.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+    .preview{background:linear-gradient(145deg,#202820,#151a16);border:1px solid #56614e;border-radius:16px;padding:20px;box-shadow:0 28px 90px #0008;transform:rotate(1.2deg)}.dots{display:flex;gap:6px;margin-bottom:18px}.dots b{width:8px;height:8px;border-radius:50%;background:#52604d}.dots b:first-child{background:var(--orange)}.terminal{font:13px/1.9 var(--mono);color:#d7dfd2}.terminal .dim{color:#849181}.terminal .green{color:var(--lime)}.terminal .orange{color:var(--orange)}
+    .section{padding:30px 0 75px}.section h2{font-size:30px;letter-spacing:-.04em;margin:0 0 24px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{border:1px solid var(--line);background:linear-gradient(145deg,#1b211c,#151916);border-radius:13px;padding:22px}.num{color:var(--orange);font:12px var(--mono)}.card h3{font-size:17px;margin:12px 0 8px}.card p{color:var(--muted);margin:0;font-size:14px}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:24px}.panel h3{margin:0 0 12px}.panel p,.panel li{color:var(--muted);font-size:14px}.panel code{color:var(--lime);font:13px var(--mono)}.panel ul{padding-left:19px;margin-bottom:0}.callout{border-left:3px solid var(--orange);padding:12px 15px;background:#fa87540d;color:#d8c3b8;font-size:13px;margin-top:16px}.foot{padding:25px 0 42px;border-top:1px solid #ffffff18;color:#889186;font:12px var(--mono);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    @media(max-width:780px){.hero{grid-template-columns:1fr;padding:64px 0 50px;gap:35px}.grid{grid-template-columns:1fr}.split{grid-template-columns:1fr}.preview{transform:none}.hero h1{font-size:54px}}
+  </style>
+</head>
+<body>
+  <header class="top wrap"><div class="brand"><i>●</i> RUST / INPUT CONTROL</div><div class="pill">LOCAL TOOL · WINDOWS</div></header>
+  <main>
+    <section class="hero wrap">
+      <div>
+        <div class="eyebrow">Small tool · Clear controls</div>
+        <h1>Less menu work.<br><span>More control.</span></h1>
+        <p class="lead">Локальный Windows-макрос для последовательного выбора в круговом меню и ввода четырёхзначных значений из собственного списка.</p>
+        <div class="actions">
+          <a class="btn primary" href="RustMacroControl.bat" download>↓ Скачать BAT</a>
+          <a class="btn secondary" href="digits.example.txt" download>Скачать пример списка</a>
+        </div>
+      </div>
+      <div class="preview" aria-label="Пример меню макроса">
+        <div class="dots"><b></b><b></b><b></b></div>
+        <div class="terminal"><span class="dim">╔════════ RUST CONTROL ════════╗</span><br>
+          <span class="green">1</span> Запустить / продолжить скрипт<br>
+          <span class="green">2</span> Сбросить список цифр<br>
+          <span class="green">3</span> Пропустить запись<br>
+          <span class="green">4</span> Просмотреть список<br>
+          <span class="orange">Right Shift</span> Пауза / продолжить<br>
+          <span class="dim">╚══════════════════════════════╝</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap">
+      <h2>Как пользоваться</h2>
+      <div class="grid">
+        <article class="card"><div class="num">01 / PREPARE</div><h3>Добавьте свой список</h3><p>Создайте рядом с BAT файл <code>digits.txt</code>: одна запись из четырёх цифр на строку. Начальные нули сохраняются.</p></article>
+        <article class="card"><div class="num">02 / START</div><h3>Выберите действие</h3><p>Запустите BAT. Через меню можно запустить управление, сбросить указатель, пропустить запись или просмотреть список.</p></article>
+        <article class="card"><div class="num">03 / CONTROL</div><h3>Пауза и продолжение</h3><p>Правый Shift ставит цикл на паузу и продолжает с текущего шага. Скрипт вводит цифры по одной и нажимает Enter.</p></article>
+      </div>
+    </section>
+
+    <section class="section wrap">
+      <div class="split">
+        <div class="panel"><h3>Файлы</h3><ul><li><code>RustMacroControl.bat</code> — программа и меню</li><li><code>digits.txt</code> — ваш локальный список</li><li><code>digits.example.txt</code> — безопасный пример формата</li></ul></div>
+        <div class="panel"><h3>Приватность списка</h3><p>Настоящий список не входит в публикацию. Создайте свой <code>digits.txt</code> рядом с BAT. Страница и пример не содержат персональных записей.</p><div class="callout">Сайт — независимый пользовательский проект, не связанный с Facepunch или Rust.</div></div>
+      </div>
+    </section>
+  </main>
+  <footer class="foot wrap"><span>RUST INPUT CONTROL</span><span>Independent community utility · Windows</span></footer>
+</body>
+</html>
+
