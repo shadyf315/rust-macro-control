@@ -119,12 +119,16 @@ function Skip-ListPointer {
     if ($pointer -lt 0 -or $pointer -ge $items.Count) { $pointer = 0 }
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
+function Show-RepositoryLink {
+    Write-Host '  GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+}
 function Show-NumberedList {
     $pageSize = 25
     $page = 0
     $lastPage = [Math]::Max(0, [Math]::Ceiling($items.Count / $pageSize) - 1)
     do {
         Clear-Host
+        Show-RepositoryLink
         Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
         Write-Host '  ║              СПИСОК ВАРИАЦИЙ                 ║' -ForegroundColor Cyan
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
@@ -142,6 +146,7 @@ function Show-NumberedList {
 }
 function Show-ControlPanel {
     Clear-Host
+    Show-RepositoryLink
     Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
     Write-Host '  ║              R U S T   C O N T R O L         ║' -ForegroundColor Cyan
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
@@ -158,6 +163,7 @@ function Show-ControlPanel {
 
 function Show-Menu {
     Clear-Host
+    Show-RepositoryLink
     Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
     Write-Host '  ║              R U S T   C O N T R O L         ║' -ForegroundColor Cyan
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
