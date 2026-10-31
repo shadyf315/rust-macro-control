@@ -139,7 +139,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host (L '  Версия v2.0.1 | GitHub: https://github.com/shadyf315/rust-macro-control' '  Version v2.0.1 | GitHub: https://github.com/shadyf315/rust-macro-control') -ForegroundColor DarkGray
+    Write-Host (L '  Версия v2.0.2 | GitHub: https://github.com/shadyf315/rust-macro-control' '  Version v2.0.2 | GitHub: https://github.com/shadyf315/rust-macro-control') -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -300,6 +300,7 @@ try {
         $index = 0
         if (Test-Path -LiteralPath $state) { $n = 0; [void][int]::TryParse((Get-Content -LiteralPath $state -Raw).Trim(), [ref]$n); $index = $n }
         if ($index -lt 0 -or $index -ge $items.Count) { $index = 0 }
+        $mouseOffsetApplied = $false
         try {
             if (-not (& $pauseMenu 5)) { continue }
 
@@ -307,12 +308,15 @@ try {
             [void][MacroInput]::SendScanCode(0x12, 0x0008)
             if (-not (& $pauseSecond)) { continue }
             [MacroInput]::mouse_event(0x0001, 82, 177, 0, [UIntPtr]::Zero)
+            $mouseOffsetApplied = $true
             if (-not (& $pauseMenu 10)) { continue }
             [MacroInput]::mouse_event(0x0002, 0, 0, 0, [UIntPtr]::Zero)
             Start-Sleep -Milliseconds 50
             [MacroInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
             if (-not (& $pauseMenu 30)) { continue }
             [void][MacroInput]::SendScanCode(0x12, 0x000A)
+            [MacroInput]::mouse_event(0x0001, -82, -177, 0, [UIntPtr]::Zero)
+            $mouseOffsetApplied = $false
             if (-not (& $pauseMenu 3)) { continue }
             $digitScans = @{ '1'=0x02; '2'=0x03; '3'=0x04; '4'=0x05; '5'=0x06; '6'=0x07; '7'=0x08; '8'=0x09; '9'=0x0A; '0'=0x0B }
             foreach ($digit in $items[$index].ToCharArray()) {
@@ -331,6 +335,7 @@ try {
         } finally {
             [MacroInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
             [void][MacroInput]::SendScanCode(0x12, 0x000A)
+            if ($mouseOffsetApplied) { [MacroInput]::mouse_event(0x0001, -82, -177, 0, [UIntPtr]::Zero) }
         }
         if ([RightShiftHotkey]::IsRunning() -ne 0) { [void](& $pauseMenu 5) }
     }
