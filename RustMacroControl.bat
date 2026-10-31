@@ -120,7 +120,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host '  Version v1.0.2 | GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+    Write-Host '  Version v1.1.0 | GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -233,6 +233,8 @@ $pauseMenu = {
     return $true
 }
 
+$attemptsSinceRespawn = 0
+
 try {
     while ($true) {
         & $toggleMacro
@@ -277,6 +279,13 @@ try {
             Start-Sleep -Milliseconds 20
             [void][MacroInput]::SendScanCode(0x1C, 0x000A)
             Set-Content -LiteralPath $state -Value (($index + 1) % $items.Count) -NoNewline
+            $attemptsSinceRespawn++
+            if ($attemptsSinceRespawn -ge 5) {
+                $attemptsSinceRespawn = 0
+                [RightShiftHotkey]::Running = 0
+                [void][RightShiftHotkey]::ConsumeToggle()
+                Write-Host '5 попыток завершено. Возродитесь вручную у первого отмеченного спальника, затем нажмите Right Shift для продолжения.' -ForegroundColor Yellow
+            }
         } finally {
             [MacroInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
             [void][MacroInput]::SendScanCode(0x12, 0x000A)
