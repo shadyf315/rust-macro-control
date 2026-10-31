@@ -1,4 +1,5 @@
 @echo off
+rem Website: https://shadyf315.github.io/rust-macro-control/
 setlocal
 powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -Command "$ErrorActionPreference='Stop'; try { $p='%~f0'; $a=[IO.File]::ReadAllText($p,[Text.Encoding]::UTF8) -split '\r?\n'; $k=[Array]::IndexOf($a,':PSCODE'); $j=[Array]::IndexOf($a,':ENDPSCODE'); if($k -lt 0 -or $j -le $k){throw 'Embedded script not found.'}; $src=$a[($k+1)..($j-1)] -join [Environment]::NewLine; & ([scriptblock]::Create($src)) } catch { Write-Host $_.Exception.ToString() -ForegroundColor Red }"
 pause
