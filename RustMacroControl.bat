@@ -120,7 +120,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host '  GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+    Write-Host '  Version v1.0.2 | GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
