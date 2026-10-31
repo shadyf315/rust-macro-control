@@ -1,6 +1,6 @@
-# Rust Macro Control
+# Утилита для рейдов в Rust
 
-Static landing page and downloadable Windows `.bat` macro.
+Локальная Windows-утилита с BAT-макросом для последовательного выполнения действий в игровом интерфейсе Rust.
 
 ## Files
 
