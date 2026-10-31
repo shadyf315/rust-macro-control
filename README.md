@@ -11,3 +11,5 @@ Static landing page and downloadable Windows `.bat` macro.
 
 The list contains one four-digit entry per line. Keep `digits.txt` beside the BAT when running it; you can replace it with your own list.
 
+The included workflow deploys the site with GitHub Pages. In the repository, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions** to enable deployment.
+
