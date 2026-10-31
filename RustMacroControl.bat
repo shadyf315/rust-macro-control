@@ -120,7 +120,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host '  G — открыть репозиторий: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+    Write-Host '  GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -128,7 +128,6 @@ function Show-NumberedList {
     $lastPage = [Math]::Max(0, [Math]::Ceiling($items.Count / $pageSize) - 1)
     do {
         Clear-Host
-        Show-RepositoryLink
         Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
         Write-Host '  ║              СПИСОК ВАРИАЦИЙ                 ║' -ForegroundColor Cyan
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
@@ -139,6 +138,7 @@ function Show-NumberedList {
         }
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
         Write-Host ('  Страница {0}/{1}  |  1 — далее  2 — назад  0 — выход' -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
+        Show-RepositoryLink
         $pageChoice = Read-Host 'Введите цифру (0-2)'
         if ($pageChoice -eq '1' -and $page -lt $lastPage) { $page++ }
         elseif ($pageChoice -eq '2' -and $page -gt 0) { $page-- }
@@ -146,7 +146,6 @@ function Show-NumberedList {
 }
 function Show-ControlPanel {
     Clear-Host
-    Show-RepositoryLink
     Write-Host '  ╔══════════════════════════════════════════════╗' -ForegroundColor DarkCyan
     Write-Host '  ║              R U S T   C O N T R O L         ║' -ForegroundColor Cyan
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
@@ -158,6 +157,7 @@ function Show-ControlPanel {
     Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
     Write-Host '  ║   Right Shift   Пауза / продолжить           ║' -ForegroundColor Yellow
     Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
+    Show-RepositoryLink
     Write-Host '  Выберите пункт (0-4): ' -NoNewline -ForegroundColor Cyan
 }
 
@@ -176,11 +176,11 @@ function Show-Menu {
     Write-Host '  ║                                              ║' -ForegroundColor DarkCyan
     Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
     Write-Host '       Во время работы: Right Shift — пауза' -ForegroundColor DarkGray
+    Show-RepositoryLink
 }
 do {
     Show-Menu
     $choice = Read-Host 'Выберите пункт (0-4)'
-    if ($choice -in @('g','G')) { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
     if ($choice -eq '2') {
         Reset-ListPointer
         Write-Host 'Позиция списка сброшена.' -ForegroundColor Green
@@ -239,7 +239,6 @@ try {
         if ([Console]::KeyAvailable) {
             $consoleKey = [Console]::ReadKey($true).KeyChar
             if ($consoleKey -eq '0') { break }
-            if ($consoleKey -eq 'g' -or $consoleKey -eq 'G') { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
             if ($consoleKey -eq '2') { Reset-ListPointer; Write-Host '  ✓ Список сброшен.' -ForegroundColor Cyan }
             if ($consoleKey -eq '3') { Skip-ListPointer; Write-Host '  → Следующая запись пропущена.' -ForegroundColor Yellow }
             if ($consoleKey -eq '4') { Show-NumberedList; Show-ControlPanel }
