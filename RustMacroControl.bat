@@ -138,12 +138,11 @@ function Show-NumberedList {
             Write-Host ('  {0,5}.  {1}' -f ($n + 1), $items[$n]) -ForegroundColor White
         }
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
-        Write-Host ('  Страница {0}/{1}  |  N — далее  P — назад  Q — выход' -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
-        $key = [Console]::ReadKey($true).KeyChar.ToString().ToUpperInvariant()
-        if ($key -eq 'G') { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
-        if ($key -eq 'N' -and $page -lt $lastPage) { $page++ }
-        elseif ($key -eq 'P' -and $page -gt 0) { $page-- }
-    } while ($key -ne 'Q')
+        Write-Host ('  Страница {0}/{1}  |  1 — далее  2 — назад  0 — выход' -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
+        $pageChoice = Read-Host 'Введите цифру (0-2)'
+        if ($pageChoice -eq '1' -and $page -lt $lastPage) { $page++ }
+        elseif ($pageChoice -eq '2' -and $page -gt 0) { $page-- }
+    } while ($pageChoice -ne '0')
 }
 function Show-ControlPanel {
     Clear-Host
