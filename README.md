@@ -2,14 +2,26 @@
 
 Локальная Windows-утилита с BAT-макросом для последовательного выполнения действий в игровом интерфейсе Rust.
 
+## Файлы
+
+- `index.html` — сайт с переключением русского и английского языков
+- `RustMacroControl.bat` — программа и меню макроса
+- `digits.txt` — список четырёхзначных записей, используемый макросом
+- `digits.example.txt` — пример формата списка
+
+В `digits.txt` каждая запись находится на отдельной строке. Файл должен лежать рядом с BAT; его можно заменить своим списком.
+
+---
+
+# Rust Raid Utility
+
+A local Windows utility with a BAT macro for running a sequence of actions in the Rust game interface.
+
 ## Files
 
-- `index.html` — site landing page
-- `RustMacroControl.bat` — macro controller
-- `digits.example.txt` — short example list format
-- `digits.txt` — published four-digit list used by the macro
+- `index.html` — website with Russian and English language toggle
+- `RustMacroControl.bat` — macro program and menu
+- `digits.txt` — four-digit entries used by the macro
+- `digits.example.txt` — example list format
 
-The list contains one four-digit entry per line. Keep `digits.txt` beside the BAT when running it; you can replace it with your own list.
-
-The included workflow deploys the site with GitHub Pages. In the repository, set **Settings → Pages → Build and deployment → Source** to **GitHub Actions** to enable deployment.
-
+Each entry in `digits.txt` is on a separate line. Keep the file next to the BAT; you can replace it with your own list.
