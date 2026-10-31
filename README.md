@@ -1,6 +1,6 @@
 # Утилита для рейдов в Rust
 
-Локальная Windows-утилита с BAT-макросом для последовательного выполнения действий в игровом интерфейсе Rust.
+Локальная Windows-утилита с BAT-макросом для последовательного выполнения действий в игровом интерфейсе Rust.\n\n[Открыть сайт](https://shadyf315.github.io/rust-macro-control/)
 
 ## Файлы
 
@@ -15,7 +15,7 @@
 
 # Rust Raid Utility
 
-A local Windows utility with a BAT macro for running a sequence of actions in the Rust game interface.
+A local Windows utility with a BAT macro for running a sequence of actions in the Rust game interface.\n\n[Open the website](https://shadyf315.github.io/rust-macro-control/)
 
 ## Files
 
