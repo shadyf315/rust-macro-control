@@ -120,7 +120,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host '  GitHub: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
+    Write-Host '  G — открыть репозиторий: https://github.com/shadyf315/rust-macro-control' -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -140,6 +140,7 @@ function Show-NumberedList {
         Write-Host '  ╠══════════════════════════════════════════════╣' -ForegroundColor DarkCyan
         Write-Host ('  Страница {0}/{1}  |  N — далее  P — назад  Q — выход' -f ($page + 1), ($lastPage + 1)) -ForegroundColor Yellow
         $key = [Console]::ReadKey($true).KeyChar.ToString().ToUpperInvariant()
+        if ($key -eq 'G') { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
         if ($key -eq 'N' -and $page -lt $lastPage) { $page++ }
         elseif ($key -eq 'P' -and $page -gt 0) { $page-- }
     } while ($key -ne 'Q')
@@ -180,6 +181,7 @@ function Show-Menu {
 do {
     Show-Menu
     $choice = Read-Host 'Выберите пункт (0-4)'
+    if ($choice -in @('g','G')) { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
     if ($choice -eq '2') {
         Reset-ListPointer
         Write-Host 'Позиция списка сброшена.' -ForegroundColor Green
@@ -191,7 +193,7 @@ do {
     } elseif ($choice -eq '4') {
         Show-NumberedList
     }
-} while ($choice -in @('2','3','4'))
+} while ($choice -in @('2','3','4','g','G'))
 if ($choice -ne '1') { exit }
 
 [RightShiftHotkey]::Start()
@@ -238,6 +240,7 @@ try {
         if ([Console]::KeyAvailable) {
             $consoleKey = [Console]::ReadKey($true).KeyChar
             if ($consoleKey -eq '0') { break }
+            if ($consoleKey -eq 'g' -or $consoleKey -eq 'G') { Start-Process 'https://github.com/shadyf315/rust-macro-control' }
             if ($consoleKey -eq '2') { Reset-ListPointer; Write-Host '  ✓ Список сброшен.' -ForegroundColor Cyan }
             if ($consoleKey -eq '3') { Skip-ListPointer; Write-Host '  → Следующая запись пропущена.' -ForegroundColor Yellow }
             if ($consoleKey -eq '4') { Show-NumberedList; Show-ControlPanel }
