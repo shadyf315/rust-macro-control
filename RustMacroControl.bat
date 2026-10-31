@@ -139,7 +139,7 @@ function Skip-ListPointer {
     Set-Content -LiteralPath $state -Value (($pointer + 1) % $items.Count) -NoNewline
 }
 function Show-RepositoryLink {
-    Write-Host (L '  Версия v2.0.0 | GitHub: https://github.com/shadyf315/rust-macro-control' '  Version v2.0.0 | GitHub: https://github.com/shadyf315/rust-macro-control') -ForegroundColor DarkGray
+    Write-Host (L '  Версия v2.0.1 | GitHub: https://github.com/shadyf315/rust-macro-control' '  Version v2.0.1 | GitHub: https://github.com/shadyf315/rust-macro-control') -ForegroundColor DarkGray
 }
 function Show-NumberedList {
     $pageSize = 25
@@ -208,17 +208,14 @@ function Show-RequiredInstructions {
         Write-Host (L '  3. Нажми 1, чтобы открыть управление. Макрос пока не запущен.' '  3. Press 1 to open control. The macro does not start yet.') -ForegroundColor White
         Write-Host (L '  4. Прочитай эту инструкцию и введи 1 для подтверждения.' '  4. Read this guide and enter 1 to confirm you read it.') -ForegroundColor White
         Write-Host (L '     Введи 0, чтобы закрыть программу.' '     Enter 0 to exit the program.') -ForegroundColor White
-        Write-Host (L 'ЗАПУСК И ВОЗРОЖДЕНИЕ' 'START AND RESPAWN') -ForegroundColor Yellow
+        Write-Host (L 'ЗАПУСК И ПАУЗА' 'START AND PAUSE') -ForegroundColor Yellow
         Write-Host (L '  5. Переключись в Rust и нажми Right Shift — цикл начнётся.' '  5. Switch to Rust and press Right Shift to start the cycle.') -ForegroundColor White
         Write-Host (L '     Right Shift ставит на паузу и продолжает с того же шага.' '     Right Shift pauses and resumes from the same step.') -ForegroundColor White
-        Write-Host (L '  6. После 5 завершённых циклов будет пауза.' '  6. The macro pauses after every 5 completed cycles.') -ForegroundColor White
-        Write-Host (L '     Возродись у первого отмеченного спальника, вернись в Rust' '     Respawn at the first marked sleeping bag, return to Rust,') -ForegroundColor White
-        Write-Host (L '     и нажми Right Shift. Макрос продолжит со следующей записью.' '     and press Right Shift. The macro continues with the next entry.') -ForegroundColor White
         Write-Host (L 'УПРАВЛЕНИЕ И СПИСОК' 'CONTROLS AND LIST') -ForegroundColor Yellow
-        Write-Host (L '  7. Цифровые команды работают, когда активно окно BAT:' '  7. Number commands work while the BAT window is focused:') -ForegroundColor White
+        Write-Host (L '  6. Цифровые команды работают, когда активно окно BAT:' '  7. Number commands work while the BAT window is focused:') -ForegroundColor White
         Write-Host (L '     1 запуск, 2 сброс, 3 пропуск, 4 список, 0 выход.' '     1 start, 2 reset, 3 skip, 4 list, 0 exit.') -ForegroundColor White
-        Write-Host (L '  8. В просмотре списка: 1 следующая, 2 предыдущая, 0 назад.' '  8. In list view: 1 next page, 2 previous page, 0 return.') -ForegroundColor White
-        Write-Host (L '  9. Позиция сохраняется в .digits-index после полного цикла.' '  9. Position is saved in .digits-index after a full cycle.') -ForegroundColor White
+        Write-Host (L '  7. В просмотре списка: 1 следующая, 2 предыдущая, 0 назад.' '  8. In list view: 1 next page, 2 previous page, 0 return.') -ForegroundColor White
+        Write-Host (L '  8. Позиция сохраняется в .digits-index после полного цикла.' '  9. Position is saved in .digits-index after a full cycle.') -ForegroundColor White
         Write-Host '  ╚══════════════════════════════════════════════╝' -ForegroundColor DarkCyan
         Show-RepositoryLink
         $ack = Read-Host (L 'Введи 1 — прочитал; 0 — выйти' 'Enter 1 — read; 0 — exit')
@@ -286,7 +283,6 @@ $pauseMenu = {
     return $true
 }
 
-$attemptsSinceRespawn = 0
 
 try {
     while ($true) {
@@ -332,13 +328,6 @@ try {
             Start-Sleep -Milliseconds 20
             [void][MacroInput]::SendScanCode(0x1C, 0x000A)
             Set-Content -LiteralPath $state -Value (($index + 1) % $items.Count) -NoNewline
-            $attemptsSinceRespawn++
-            if ($attemptsSinceRespawn -ge 5) {
-                $attemptsSinceRespawn = 0
-                [RightShiftHotkey]::Running = 0
-                [void][RightShiftHotkey]::ConsumeToggle()
-                Write-Host (L '5 попыток завершено. Возродись вручную у первого отмеченного спальника и нажми Right Shift для продолжения.' '5 attempts completed. Respawn manually at the first marked sleeping bag, then press Right Shift to continue.') -ForegroundColor Yellow
-            }
         } finally {
             [MacroInput]::mouse_event(0x0004, 0, 0, 0, [UIntPtr]::Zero)
             [void][MacroInput]::SendScanCode(0x12, 0x000A)
